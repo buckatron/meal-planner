@@ -1,0 +1,453 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Source Sans 3", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  background: #fdf7ee;
+  color: #3b352f;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  padding: 2.5rem 1.5rem 1.75rem;
+  background: radial-gradient(circle at top left, #fce3c6 0, #fdf7ee 45%, #f3e3cf 100%);
+  border-bottom: 1px solid rgba(107, 79, 56, 0.16);
+}
+
+.app-header__content {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.app-title {
+  margin: 0 0 0.35rem;
+  font-family: "Playfair Display", "Times New Roman", serif;
+  font-size: 2.4rem;
+  letter-spacing: 0.04em;
+  color: #2f3e3b;
+}
+
+.app-subtitle {
+  margin: 0;
+  max-width: 32rem;
+  font-size: 0.98rem;
+  color: #6b4f38;
+}
+
+.app-main {
+  flex: 1;
+  padding: 1.75rem 1.5rem 3rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.section-card {
+  background: #fefbf5;
+  border-radius: 14px;
+  padding: 1.5rem 1.75rem 1.75rem;
+  box-shadow: 0 18px 40px rgba(56, 35, 18, 0.09);
+  border: 1px solid rgba(146, 115, 86, 0.32);
+}
+
+.section-card--stacked {
+  margin-top: 1.5rem;
+}
+
+.section-title {
+  margin: 0 0 1rem;
+  font-family: "Playfair Display", "Times New Roman", serif;
+  font-size: 1.4rem;
+  color: #2f3e3b;
+}
+
+.planner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem 1.5rem;
+  align-items: flex-start;
+}
+
+.planner-field {
+  min-width: 0;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #7b5c3d;
+}
+
+.field-help {
+  margin: 0.3rem 0 0;
+  font-size: 0.82rem;
+  color: #8c7662;
+}
+
+.input {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(129, 104, 79, 0.4);
+  padding: 0.45rem 0.8rem;
+  font-size: 0.95rem;
+  background: #fffdf8;
+  color: #3b352f;
+}
+
+.input:focus {
+  outline: 2px solid rgba(188, 121, 82, 0.45);
+  outline-offset: 1px;
+}
+
+.input--number {
+  max-width: 5rem;
+}
+
+.energy-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.checkbox-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.5rem 0.18rem;
+  border-radius: 999px;
+  border: 1px solid rgba(129, 104, 79, 0.4);
+  background: rgba(255, 252, 245, 0.8);
+  cursor: pointer;
+  font-size: 0.86rem;
+}
+
+.checkbox-pill input {
+  accent-color: #b3673f;
+}
+
+.checkbox-pill__label {
+  padding-right: 0.1rem;
+}
+
+.planner-actions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.button {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 0.55rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease,
+    transform 120ms ease;
+  font-family: inherit;
+}
+
+.button:disabled {
+  cursor: default;
+  opacity: 0.7;
+  box-shadow: none;
+  transform: none;
+}
+
+.button--primary {
+  background: linear-gradient(135deg, #355046, #2f3e3b);
+  color: #fdf7ee;
+  box-shadow: 0 10px 24px rgba(31, 58, 48, 0.4);
+}
+
+.button--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #314840, #283632);
+  transform: translateY(-1px);
+}
+
+.button--secondary {
+  background: #e1b676;
+  color: #3a2f25;
+  border-color: rgba(144, 97, 45, 0.45);
+  box-shadow: 0 10px 22px rgba(142, 93, 40, 0.34);
+}
+
+.button--secondary:hover:not(:disabled) {
+  background: #d7a962;
+  transform: translateY(-1px);
+}
+
+.button--ghost {
+  background: transparent;
+  border-color: rgba(122, 98, 74, 0.6);
+  color: #5b4734;
+}
+
+.button--ghost:hover:not(:disabled) {
+  background: rgba(246, 232, 217, 0.8);
+}
+
+.banner {
+  margin-top: 0.9rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.banner--warning {
+  background: #fff5da;
+  border: 1px solid #d1a547;
+  color: #6f5419;
+}
+
+.banner--error {
+  background: #ffe8e3;
+  border: 1px solid #c45540;
+  color: #7a3221;
+}
+
+.meal-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.meal-plan__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem 1.2rem;
+}
+
+.meal-plan__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.meal-card {
+  position: relative;
+  background: #fffdf8;
+  border-radius: 12px;
+  padding: 0.9rem 1rem 0.85rem;
+  border: 1px solid rgba(157, 127, 97, 0.4);
+  box-shadow: 0 14px 26px rgba(50, 35, 22, 0.1);
+  overflow: hidden;
+}
+
+.meal-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.28) 0,
+      transparent 40%
+    ),
+    radial-gradient(circle at top right, rgba(238, 209, 178, 0.45), transparent 55%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.meal-card__header,
+.meal-card__summary,
+.meal-card__footer {
+  position: relative;
+  z-index: 1;
+}
+
+.meal-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.meal-card__day {
+  text-align: center;
+}
+
+.meal-card__day-label {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8c7662;
+}
+
+.meal-card__day-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: #2f3e3b;
+  color: #fdf7ee;
+  font-weight: 600;
+  font-size: 0.96rem;
+}
+
+.meal-card__title-block {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.meal-card__name {
+  margin: 0;
+  font-family: "Playfair Display", "Times New Roman", serif;
+  font-size: 1.07rem;
+  color: #2f3e3b;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.5rem;
+  padding: 0.15rem 0.65rem 0.2rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  border: 1px solid transparent;
+}
+
+.badge--low {
+  background: #d8e7ce;
+  border-color: #94b37c;
+  color: #3d5b29;
+}
+
+.badge--medium {
+  background: #f4e0b6;
+  border-color: #d2aa63;
+  color: #7b5a22;
+}
+
+.badge--high {
+  background: #f0c5b4;
+  border-color: #c47a59;
+  color: #6d3821;
+}
+
+.badge--extra-high {
+  background: #e9a9a2;
+  border-color: #b95045;
+  color: #5e231c;
+}
+
+.meal-card__summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin: 0.1rem 0 0.55rem;
+}
+
+.meal-card__summary dt {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #8c7a66;
+}
+
+.meal-card__summary dd {
+  margin: 0.1rem 0 0;
+  font-size: 0.9rem;
+  color: #3d352f;
+}
+
+.meal-card__footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@keyframes cardFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.meal-card--rerolling {
+  animation: cardFade 0.28s ease-out;
+}
+
+.shopping-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.shopping-list__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.shopping-list__group {
+  padding-right: 0.5rem;
+}
+
+.shopping-list__heading {
+  margin: 0 0 0.3rem;
+  font-family: "Playfair Display", "Times New Roman", serif;
+  font-size: 1.02rem;
+  color: #2f3e3b;
+}
+
+.shopping-list__items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.shopping-list__items li {
+  padding: 0.12rem 0;
+  border-bottom: 1px dotted rgba(171, 141, 111, 0.4);
+}
+
+.shopping-list__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 720px) {
+  .app-header {
+    padding: 2rem 1.1rem 1.4rem;
+  }
+
+  .app-main {
+    padding: 1.4rem 1.1rem 2.2rem;
+  }
+
+  .section-card {
+    padding: 1.2rem 1.2rem 1.4rem;
+  }
+
+  .planner-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
