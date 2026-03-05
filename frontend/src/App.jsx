@@ -107,24 +107,10 @@ function App() {
     <div className="app-shell">
       <header className="app-header">
         <div className="app-header__content">
-          <div>
-            <h1 className="app-title">Kitchen Notebook</h1>
-            <p className="app-subtitle">
-              Plan a week of dinners and gather a tidy market list in one place.
-            </p>
-          </div>
-          <div className="app-header__actions">
-            <button
-              type="button"
-              className="button button--ghost button--small"
-              onClick={() => {
-                setShowSuggest((prev) => !prev);
-                setSuggestError(null);
-              }}
-            >
-              ✨ Add Meals
-            </button>
-          </div>
+          <h1 className="app-title">Kitchen Notebook</h1>
+          <p className="app-subtitle">
+            Plan a week of dinners and gather a tidy market list in one place.
+          </p>
         </div>
       </header>
 
@@ -141,6 +127,11 @@ function App() {
             onServingsChange={setServings}
             onGeneratePlan={handleGeneratePlan}
             loading={loadingPlan}
+            onToggleSuggest={() => {
+              setShowSuggest((prev) => !prev);
+              setSuggestError(null);
+            }}
+            showSuggest={showSuggest}
           />
           {warning && <div className="banner banner--warning">{warning}</div>}
           {error && <div className="banner banner--error">{error}</div>}

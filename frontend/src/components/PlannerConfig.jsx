@@ -9,7 +9,9 @@ function PlannerConfig({
   servings,
   onServingsChange,
   onGeneratePlan,
-  loading
+  loading,
+  onToggleSuggest,
+  showSuggest
 }) {
   const handleDaysChange = (event) => {
     const value = Number(event.target.value) || 1;
@@ -85,6 +87,15 @@ function PlannerConfig({
         >
           {loading ? "Gathering recipes…" : "Generate Plan"}
         </button>
+        {onToggleSuggest && (
+          <button
+            type="button"
+            className="button button--ghost button--small"
+            onClick={onToggleSuggest}
+          >
+            {showSuggest ? "Hide Add Meals" : "✨ Add Meals"}
+          </button>
+        )}
       </div>
     </div>
   );
