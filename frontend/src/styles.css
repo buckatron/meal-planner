@@ -468,6 +468,10 @@ body {
   justify-content: flex-start;
 }
 
+.suggest-panel__actions .suggest-panel__close {
+  margin-left: 0.5rem;
+}
+
 .suggest-panel__loading {
   margin-top: 0.9rem;
   display: flex;

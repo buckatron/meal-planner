@@ -151,6 +151,7 @@ function App() {
           {showSuggest && (
             <SuggestMealsPanel
               onError={setSuggestError}
+              onClose={() => setShowSuggest(false)}
             />
           )}
         </section>

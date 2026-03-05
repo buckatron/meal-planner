@@ -3,7 +3,7 @@ import { suggestMeals, appendMeals } from "../api.js";
 
 const ENERGY_OPTIONS = ["", "Low", "Medium", "High", "Extra High"];
 
-function SuggestMealsPanel({ onError }) {
+function SuggestMealsPanel({ onError, onClose }) {
   const [count, setCount] = useState(5);
   const [prompt, setPrompt] = useState("");
   const [energyFilter, setEnergyFilter] = useState("");
@@ -119,6 +119,15 @@ function SuggestMealsPanel({ onError }) {
           >
             {loading ? "Generating…" : "Generate"}
           </button>
+          {onClose && (
+            <button
+              type="button"
+              className="button button--ghost button--small suggest-panel__close"
+              onClick={onClose}
+            >
+              Hide
+            </button>
+          )}
         </div>
       </div>
 
