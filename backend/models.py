@@ -56,3 +56,35 @@ class ShoppingListResponse(BaseModel):
             "Other": self.Other,
         }
 
+
+class CsvMeal(BaseModel):
+    MealName: str
+    Protein: str
+    Carb: str
+    Sauce: str
+    Veg: str
+    Other: str
+    Energy: str
+
+
+class SuggestRequest(BaseModel):
+    count: int = 5
+    prompt: str = ""
+    energy_filter: str = ""
+
+
+class SuggestResponse(BaseModel):
+    suggested: List[CsvMeal]
+    warning: Optional[str] = None
+
+
+class AppendMealsRequest(BaseModel):
+    meals: List[CsvMeal]
+
+
+class AppendMealsResponse(BaseModel):
+    appended: int
+    skipped_duplicates: int
+    total_meals: int
+
+

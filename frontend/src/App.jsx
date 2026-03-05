@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import PlannerConfig from "./components/PlannerConfig.jsx";
 import MealPlan from "./components/MealPlan.jsx";
 import ShoppingList from "./components/ShoppingList.jsx";
-import { generatePlan, rerollMeal, getShoppingList } from "./api.js";
+import SuggestMealsPanel from "./components/SuggestMealsPanel.jsx";
+import {
+  generatePlan,
+  rerollMeal,
+  getShoppingList
+} from "./api.js";
 
 const ENERGY_LEVELS = ["Low", "Medium", "High", "Extra High"];
 
@@ -19,6 +24,8 @@ function App() {
   const [loadingRerollFor, setLoadingRerollFor] = useState(null);
   const [loadingShoppingList, setLoadingShoppingList] = useState(false);
   const [error, setError] = useState(null);
+  const [suggestError, setSuggestError] = useState(null);
+  const [showSuggest, setShowSuggest] = useState(false);
 
   const handleToggleEnergy = (level) => {
     setEnergyFilter((prev) =>
@@ -92,16 +99,32 @@ function App() {
     setDays(5);
     setEnergyFilter([...ENERGY_LEVELS]);
     setServings(2);
+    setShowSuggest(false);
+    setSuggestError(null);
   };
 
   return (
     <div className="app-shell">
       <header className="app-header">
         <div className="app-header__content">
-          <h1 className="app-title">Kitchen Notebook</h1>
-          <p className="app-subtitle">
-            Plan a week of dinners and gather a tidy market list in one place.
-          </p>
+          <div>
+            <h1 className="app-title">Kitchen Notebook</h1>
+            <p className="app-subtitle">
+              Plan a week of dinners and gather a tidy market list in one place.
+            </p>
+          </div>
+          <div className="app-header__actions">
+            <button
+              type="button"
+              className="button button--ghost button--small"
+              onClick={() => {
+                setShowSuggest((prev) => !prev);
+                setSuggestError(null);
+              }}
+            >
+              ✨ Add Meals
+            </button>
+          </div>
         </div>
       </header>
 
@@ -121,6 +144,15 @@ function App() {
           />
           {warning && <div className="banner banner--warning">{warning}</div>}
           {error && <div className="banner banner--error">{error}</div>}
+          {suggestError && (
+            <div className="banner banner--error">{suggestError}</div>
+          )}
+
+          {showSuggest && (
+            <SuggestMealsPanel
+              onError={setSuggestError}
+            />
+          )}
         </section>
 
         {plan.length > 0 && (

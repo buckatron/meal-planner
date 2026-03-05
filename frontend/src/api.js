@@ -39,3 +39,19 @@ export async function getShoppingList(mealNames, servings) {
   return response.data;
 }
 
+export async function suggestMeals(count, prompt, energyFilter) {
+  const response = await api.post("/suggest", {
+    count,
+    prompt,
+    energy_filter: energyFilter || ""
+  });
+  return response.data;
+}
+
+export async function appendMeals(meals) {
+  const response = await api.post("/meals/append", {
+    meals
+  });
+  return response.data;
+}
+

@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import json
 import random
 from pathlib import Path
-from typing import Iterable, List, Dict, Set
+from typing import Iterable, List, Dict, Set, Tuple
 
 import pandas as pd
+from groq import Groq
 
-from models import Meal
+from models import Meal, CsvMeal
 
 
 def load_meals(path: Path) -> List[Meal]:
@@ -158,4 +160,126 @@ def generate_shopping_list(meals: Iterable[Meal], servings: int) -> Dict[str, Li
         result[cat] = [f"{name} x{servings}" for name in items.values()]
 
     return result
+
+
+def suggest_meals(
+    client: Groq,
+    count: int,
+    existing_names: List[str],
+    prompt: str = "",
+    energy_filter: str = "",
+) -> List[Dict[str, str]]:
+    """
+    Ask Groq to suggest new meals in CSV schema form.
+    Returns a list of dicts suitable for CsvMeal / direct CSV append.
+    """
+    existing_list = "\n".join(f"- {name}" for name in existing_names)
+
+    energy_instruction = ""
+    if energy_filter:
+        energy_instruction = f"All meals must have an Energy level of '{energy_filter}'."
+
+    vibe_instruction = ""
+    if prompt:
+        vibe_instruction = f"Focus on this theme or cuisine: {prompt}."
+
+    system_prompt = """You are a meal planning assistant. When asked to generate meals, you respond ONLY with a valid JSON array and nothing else — no preamble, no explanation, no markdown code fences.
+
+Each meal object must have exactly these keys:
+- MealName (string)
+- Protein (string, can be comma-separated if multiple e.g. "Shrimp, Egg")
+- Carb (string, can be comma-separated if multiple e.g. "Rice, Tortilla")
+- Sauce (string)
+- Veg (string, can be comma-separated if multiple)
+- Other (string, can be comma-separated if multiple, or empty string if none)
+- Energy (string, must be exactly one of: "Low", "Medium", "High", "Extra High")
+
+Rules:
+- Ingredient values should be concise and title-cased (e.g. "Chicken Thigh" not "boneless skinless chicken thighs")
+- Do not include cooking instructions or quantities
+- Keep ingredient names consistent with common grocery store terms
+- Other field can be empty string "" if there are no additional ingredients"""
+
+    user_prompt = f"""Generate {count} new meal ideas.
+
+Do not repeat any of these existing meals:
+{existing_list}
+
+{vibe_instruction}
+{energy_instruction}
+
+Respond with a JSON array of {count} meal objects only."""
+
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        temperature=0.8,
+    )
+
+    raw = response.choices[0].message.content.strip()
+
+    # Safety: strip any accidental markdown fences
+    if raw.startswith("```"):
+        parts = raw.split("```")
+        if len(parts) > 1:
+            raw = parts[1]
+        if raw.lstrip().startswith("json"):
+            raw = raw.lstrip()[4:]
+    raw = raw.strip()
+
+    data = json.loads(raw)
+    if not isinstance(data, list):
+        raise ValueError("AI did not return a JSON array.")
+    return data
+
+
+def append_meals_to_csv(path: Path, meals: List[CsvMeal]) -> Tuple[int, int, int]:
+    """
+    Append new meals to the CSV file, skipping duplicates by MealName (case-insensitive).
+    Returns (appended_count, skipped_duplicates_count, total_meals_after).
+    """
+    if not meals:
+        df_existing = pd.read_csv(path)
+        return 0, 0, len(df_existing)
+
+    df_existing = pd.read_csv(path)
+    existing_names = {
+        str(name).strip().lower() for name in df_existing.get("MealName", [])
+    }
+
+    rows_to_add = []
+    skipped = 0
+
+    for meal in meals:
+        name = meal.MealName.strip()
+        if name.lower() in existing_names:
+            skipped += 1
+            continue
+        existing_names.add(name.lower())
+        rows_to_add.append(
+            {
+                "MealName": meal.MealName,
+                "Protein": meal.Protein,
+                "Carb": meal.Carb,
+                "Sauce": meal.Sauce,
+                "Veg": meal.Veg,
+                "Other": meal.Other,
+                "Energy": meal.Energy,
+            }
+        )
+
+    if rows_to_add:
+        df_new = pd.DataFrame(rows_to_add)
+        df_all = pd.concat([df_existing, df_new], ignore_index=True)
+        df_all.to_csv(path, index=False)
+        appended = len(rows_to_add)
+        total = len(df_all)
+    else:
+        appended = 0
+        total = len(df_existing)
+
+    return appended, skipped, total
 

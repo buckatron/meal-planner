@@ -3,3 +3,5 @@ uvicorn
 pandas
 pydantic
 python-multipart
+groq
+python-dotenv

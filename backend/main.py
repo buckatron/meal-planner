@@ -1,10 +1,22 @@
 from pathlib import Path
 from typing import List
 
+import os
+import random
+
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from groq import Groq
 
-from meal_service import load_meals, generate_plan, filter_meals, generate_shopping_list
+from meal_service import (
+    load_meals,
+    generate_plan,
+    filter_meals,
+    generate_shopping_list,
+    suggest_meals,
+    append_meals_to_csv,
+)
 from models import (
     Meal,
     PlanRequest,
@@ -13,9 +25,16 @@ from models import (
     RerollRequest,
     ShoppingListRequest,
     ShoppingListResponse,
+    SuggestRequest,
+    SuggestResponse,
+    AppendMealsRequest,
+    AppendMealsResponse,
+    CsvMeal,
 )
-import random
 
+
+load_dotenv()
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 app = FastAPI(title="Meal Planner API")
 
@@ -30,6 +49,10 @@ app.add_middleware(
 
 DATA_PATH = Path(__file__).parent / "data" / "mealRepo.csv"
 MEALS: List[Meal] = load_meals(DATA_PATH)
+
+groq_client: Groq | None = None
+if GROQ_API_KEY:
+    groq_client = Groq(api_key=GROQ_API_KEY)
 
 
 @app.get("/meals", response_model=List[Meal])
@@ -103,4 +126,64 @@ async def shopping_list(request: ShoppingListRequest) -> ShoppingListResponse:
 
     grouped = generate_shopping_list(selected_meals, request.servings)
     return ShoppingListResponse(**grouped)
+
+
+@app.post("/suggest", response_model=SuggestResponse)
+async def suggest(request: SuggestRequest) -> SuggestResponse:
+    """
+    Use Groq to suggest new meals in the CSV schema.
+    """
+    if not GROQ_API_KEY or groq_client is None:
+        raise HTTPException(
+            status_code=401, detail="Groq API key not configured."
+        )
+
+    count = request.count or 5
+    count = max(1, min(count, 10))
+
+    # Always load from CSV so we have the latest meals.
+    existing_meals = load_meals(DATA_PATH)
+    existing_names = [m.name for m in existing_meals]
+
+    try:
+        raw_meals = suggest_meals(
+            client=groq_client,
+            count=count,
+            existing_names=existing_names,
+            prompt=request.prompt or "",
+            energy_filter=request.energy_filter or "",
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=500,
+            detail="AI returned an unexpected format. Please try again.",
+        ) from exc
+    except Exception as exc:  # pragma: no cover - defensive
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to generate meal suggestions right now.",
+        ) from exc
+
+    # Validate via CsvMeal model.
+    meals = [CsvMeal(**item) for item in raw_meals]
+
+    return SuggestResponse(suggested=meals, warning=None)
+
+
+@app.post("/meals/append", response_model=AppendMealsResponse)
+async def append_meals(request: AppendMealsRequest) -> AppendMealsResponse:
+    """
+    Append confirmed meals to the CSV file, skipping duplicates by MealName.
+    """
+    appended, skipped, total = append_meals_to_csv(DATA_PATH, request.meals)
+
+    # Refresh in-memory MEALS so subsequent requests see the new meals.
+    global MEALS
+    MEALS = load_meals(DATA_PATH)
+
+    return AppendMealsResponse(
+        appended=appended,
+        skipped_duplicates=skipped,
+        total_meals=total,
+    )
 
